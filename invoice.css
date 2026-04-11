@@ -343,9 +343,11 @@ body.dark-mode .inv-select { background: var(--bg); }
    A4 INVOICE DOCUMENT
    A4 = 210mm × 297mm
    At 96dpi: 794px × 1123px
+   Supports multiple pages with auto-pagination
    ============================================================ */
 .invoice-a4 {
   width: 794px;
+  height: auto;
   min-height: 1123px;
   background: #ffffff;
   color: #2c3e50;
@@ -354,6 +356,8 @@ body.dark-mode .inv-select { background: var(--bg); }
   box-shadow: 0 8px 40px rgba(0,0,0,0.22);
   display: flex;
   flex-direction: column;
+  page-break-after: always;
+  margin-bottom: 20px;
 }
 
 /* ── Header ── */
@@ -647,6 +651,7 @@ body.dark-mode .inv-select { background: var(--bg); }
 
 /* ============================================================
    PRINT — exact A4, no shadows, force colours
+   Multiple pages supported with proper page breaks
    ============================================================ */
 @media print {
   @page {
@@ -656,7 +661,6 @@ body.dark-mode .inv-select { background: var(--bg); }
 
   html, body {
     width: 210mm;
-    height: 297mm;
     margin: 0;
     padding: 0;
     background: white !important;
@@ -667,16 +671,38 @@ body.dark-mode .inv-select { background: var(--bg); }
 
   #printRoot {
     display: block !important;
-    position: fixed;
-    inset: 0;
+    position: static;
+    width: 210mm;
   }
 
   .invoice-a4 {
     width: 210mm !important;
-    min-height: 297mm !important;
+    height: auto !important;
+    min-height: auto !important;
     box-shadow: none !important;
+    page-break-after: always;
     page-break-inside: avoid;
+    margin: 0 !important;
+    padding: 0 !important;
+    display: flex;
+    flex-direction: column;
   }
+
+  /* Ensure last invoice doesn't have extra page break */
+  .invoice-a4:last-child {
+    page-break-after: auto;
+  }
+
+  /* Allow internal sections to break across pages if needed */
+  .inv-header { page-break-inside: avoid; }
+  .inv-body { page-break-inside: auto; }
+  .inv-footer { page-break-inside: avoid; }
+  
+  /* Table header should stay with first row */
+  .inv-tbl thead { display: table-header-group; }
+  
+  /* Prevent orphaned table rows */
+  .inv-tbl tbody tr { page-break-inside: avoid; }
 
   /* Force backgrounds to print */
   .inv-header,
