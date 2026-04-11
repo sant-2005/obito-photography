@@ -169,6 +169,8 @@
 <div class="toast" id="globalToast"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
 <script src="shared.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="supabase.js"></script>
 <script src="db.js"></script>
 <script>
 let barChart = null, donutChart = null;
@@ -181,10 +183,11 @@ function updateGreeting() {
   const msgs = [
     [5,  'Still up? 🌙',       "Burning the midnight oil — let's check your stats."],
     [12, 'Good morning! 🌅',   'Time to start your day strong.'],
-    [18, 'Good afternoon! ☀️', 'Keep up the great work!'],
-    [24, 'Good evening! 🌙',   "Here's today's performance summary."]
+    [17, 'Good afternoon! ☀️', 'Keep up the great work!'],
+    [21, 'Good evening! 🌇',   "Here's today's performance summary."],
+    [24, 'Good night! 🌙',     'Time to wrap up and rest.']
   ];
-  const [, greet, subtitle] = msgs.find(([limit]) => h < limit) || msgs[3];
+  const [, greet, subtitle] = msgs.find(([limit]) => h < limit) || msgs[msgs.length - 1];
   el.innerHTML = greet;
   if (sub) sub.textContent = subtitle;
 }
@@ -232,7 +235,10 @@ function loadPending(bookings) {
   }
   list.innerHTML = items.map((b, i) => {
     const cls = b.status === 'Confirmed' ? 'bc' : b.status === 'In Progress' ? 'bi' : 'bp';
-    const date = b.eventDate ? new Date(b.eventDate).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}) : 'TBD';
+    const date = b.eventDate
+      ? new Date(/^\d{4}-\d{2}-\d{2}$/.test(b.eventDate) ? b.eventDate + 'T00:00:00' : b.eventDate)
+          .toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})
+      : 'TBD';
     return `<div class="pending-item" style="animation-delay:${(i*.06).toFixed(2)}s">
       <div>
         <div class="pending-name">${b.eventType || 'Event'} — ${b.customerName || 'Customer'}</div>
@@ -250,7 +256,10 @@ function buildCharts(bookings, advance, budget) {
   const yr    = new Date().getFullYear();
   const mc    = new Array(12).fill(0);
   bookings.forEach(b => {
-    const d = new Date(b.eventDate || b.createdAt);
+    const raw = b.eventDate || b.createdAt;
+    if (!raw) return;
+    const normalized = /^\d{4}-\d{2}-\d{2}$/.test(raw) ? raw + 'T00:00:00' : raw;
+    const d = new Date(normalized);
     if (!isNaN(d) && d.getFullYear() === yr) mc[d.getMonth()]++;
   });
   const total = mc.reduce((s,v) => s + v, 0);
