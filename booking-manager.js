@@ -551,7 +551,9 @@ const BookingsList = (() => {
   /** Format a date string for display. */
   function _fmtDate(dateStr) {
     if (!dateStr) return '—';
-    const d = new Date(dateStr);
+    // Append T00:00:00 to plain YYYY-MM-DD so it is parsed as local time, not UTC
+    const normalized = /^\d{4}-\d{2}-\d{2}$/.test(dateStr) ? dateStr + 'T00:00:00' : dateStr;
+    const d = new Date(normalized);
     if (isNaN(d)) return _esc(dateStr);
     return d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
   }
