@@ -278,6 +278,10 @@ body.dark-mode .inv-select { background: var(--bg); }
 .inv-empty .empty-title { font-size:16px; font-weight:700; margin-bottom:6px; }
 .inv-empty .empty-desc  { font-size:13px; color:var(--text-muted); }
 
+/* Selected table row */
+.inv-table tbody tr.row-selected { background: var(--primary-light) !important; }
+.inv-table tbody tr.row-selected td { border-bottom-color: var(--primary); }
+
 /* ============================================================
    INVOICE MODAL — Full-screen A4 preview
    ============================================================ */
@@ -337,6 +341,7 @@ body.dark-mode .inv-select { background: var(--bg); }
   padding: 32px 20px 48px;
   display: flex;
   justify-content: center;
+  align-items: flex-start;
 }
 
 /* ============================================================
