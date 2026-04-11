@@ -43,11 +43,17 @@ const Invoices = (() => {
   }
 
   /**
-   * Format date for display
+   * Format date for display.
+   * Handles ISO date-only strings (YYYY-MM-DD) by appending T00:00:00
+   * so the local timezone is used instead of UTC, avoiding off-by-one-day errors.
    */
   function _fmtDate(d, opts) {
     if (!d) return '—';
-    return new Date(d).toLocaleDateString('en-IN', opts || {
+    // If it's a plain date string like "2026-04-15", treat it as local time
+    const normalized = (typeof d === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(d))
+      ? d + 'T00:00:00'
+      : d;
+    return new Date(normalized).toLocaleDateString('en-IN', opts || {
       day: 'numeric',
       month: 'long',
       year: 'numeric'
@@ -59,8 +65,14 @@ const Invoices = (() => {
    */
   function _payStatus(budget, advance, eventDate) {
     const pct = budget > 0 ? advance / budget : 0;
-    const past = eventDate && new Date(eventDate) < new Date();
-    
+    let past = false;
+    if (eventDate) {
+      // Parse YYYY-MM-DD as local date to avoid UTC timezone shift
+      const normalized = /^\d{4}-\d{2}-\d{2}$/.test(eventDate)
+        ? eventDate + 'T00:00:00'
+        : eventDate;
+      past = new Date(normalized) < new Date();
+    }
     if (pct >= 1) return 'Paid';
     if (past && pct < 1) return 'Overdue';
     if (pct > 0) return 'Partially Paid';
@@ -177,11 +189,14 @@ const Invoices = (() => {
         
         if (_chip === 'today') {
           if (!ed) return false;
-          const d = new Date(ed);
+          const normalized = /^\d{4}-\d{2}-\d{2}$/.test(ed) ? ed + 'T00:00:00' : ed;
+          const d = new Date(normalized);
           d.setHours(0, 0, 0, 0);
           if (d.getTime() !== today.getTime()) return false;
         } else if (_chip === 'month') {
-          if (!ed || ed < mStart) return false;
+          if (!ed) return false;
+          const normalized = /^\d{4}-\d{2}-\d{2}$/.test(ed) ? ed + 'T00:00:00' : ed;
+          if (new Date(normalized) < mStart) return false;
         } else if (_chip === 'overdue') {
           if (ps !== 'Overdue') return false;
         }
@@ -560,7 +575,7 @@ const Invoices = (() => {
     const due = budget - advance;
     const pct = budget > 0 ? Math.round((advance / budget) * 100) : 0;
     const ps = _payStatus(budget, advance, b.eventDate);
-    const today = _fmtDate(new Date().toISOString());
+    const today = _fmtDate(new Date().toLocaleDateString('en-CA')); // en-CA gives YYYY-MM-DD local
     const evtDate = _fmtDate(b.eventDate);
 
     const badgeCls = { 'Paid': 'paid', 'Partially Paid': 'partial', 'Unpaid': 'unpaid', 'Overdue': 'overdue' }[ps] || 'unpaid';
