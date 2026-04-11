@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Invoices — Obito Photography</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="animations.css">
+  <link rel="stylesheet" href="shared.css">
+  <link rel="stylesheet" href="invoice.css">
+  <style>
+    .inv-stats { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:22px; }
+    @media(max-width:900px){ .inv-stats{ grid-template-columns:repeat(2,1fr); } }
+    @media(max-width:640px){ .inv-stats{ grid-template-columns:1fr 1fr; } }
+    /* Selected row highlight */
+    .row-selected { background: var(--primary-light) !important; }
+  </style>
+</head>
+<body>
+
+<!-- ── Sidebar ── -->
+<aside class="sidebar">
+  <div class="sidebar-logo" onclick="navigateTo('dashboard.html')" title="Home">OP</div>
+  <nav class="sidebar-items">
+    <div class="sidebar-item"        data-page="dashboard.html"     data-title="Dashboard" onclick="navigateTo('dashboard.html')">📊</div>
+    <div class="sidebar-item"        data-page="bookings-list.html" data-title="Bookings"  onclick="navigateTo('bookings-list.html')">📅</div>
+    <div class="sidebar-item"        data-page="customers.html"     data-title="Customers" onclick="navigateTo('customers.html')">👥</div>
+    <div class="sidebar-item active" data-page="invoices.html"      data-title="Invoices">📄</div>
+  </nav>
+  <div class="sidebar-logout" data-action="logout" title="Logout">🚪</div>
+</aside>
+
+<!-- ── Main ── -->
+<div class="main-content">
+  <header class="topbar">
+    <div class="topbar-left"><span class="topbar-title">📄 Invoices</span></div>
+    <div class="topbar-right">
+      <div class="topbar-date">
+        <span class="date-label">Today</span>
+        <span class="date-value" id="currentDate">—</span>
+      </div>
+      <button class="theme-btn" id="themeBtn" title="Toggle theme">🌙</button>
+      <div class="user-btn" id="userBtn">
+        <div class="user-avatar" id="userAvatarInitials">U</div>
+        <div class="user-info">
+          <div class="user-name" id="userNameDisplay">User</div>
+          <div class="user-role">Admin</div>
+        </div>
+        <span class="user-chevron">▼</span>
+        <div class="user-dropdown" id="userDropdown">
+          <div class="dropdown-header">
+            <div class="dropdown-avatar" id="dropdownAvatar">U</div>
+            <div>
+              <div class="dropdown-name" id="dropdownName">User</div>
+              <div class="dropdown-status">● Active</div>
+            </div>
+          </div>
+          <div class="dropdown-menu">
+            <a class="dropdown-item" onclick="navigateTo('dashboard.html')"><span class="dropdown-item-icon">📊</span> Dashboard</a>
+            <a class="dropdown-item" onclick="navigateTo('bookings-list.html')"><span class="dropdown-item-icon">📅</span> Bookings</a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item danger" onclick="logout()"><span class="dropdown-item-icon">🚪</span> Logout</a>
+          </div>
+        </div>
+      </div>
+      <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
+  </header>
+
+  <!-- ── Page Content ── -->
+  <div class="page-content">
+    <div class="page-header">
+      <div class="page-header-text">
+        <a class="page-back" href="dashboard.html">← Dashboard</a>
+        <h1>Invoice Management</h1>
+        <p>View and manage all booking invoices</p>
+      </div>
+      <button class="btn btn-primary" onclick="navigateTo('add-booking.html')">➕ New Booking</button>
+    </div>
+
+    <!-- ── Stats Cards ── -->
+    <div class="inv-stats">
+      <div class="stat-card">
+        <div class="stat-icon">📄</div>
+        <div class="stat-label">Total Invoices</div>
+        <div class="stat-value" id="is-total">—</div>
+        <div class="stat-change">Generated</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">💰</div>
+        <div class="stat-label">Total Value</div>
+        <div class="stat-value" id="is-value">—</div>
+        <div class="stat-change">Budget total</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">✅</div>
+        <div class="stat-label">Collected</div>
+        <div class="stat-value" id="is-collected">—</div>
+        <div class="stat-change">Advance paid</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">⏳</div>
+        <div class="stat-label">Outstanding</div>
+        <div class="stat-value" id="is-pending">—</div>
+        <div class="stat-change down">To collect</div>
+      </div>
+    </div>
+
+    <!-- ── Quick Chips ── -->
+    <div class="inv-chips" style="margin-bottom:14px;">
+      <span class="inv-chip" data-chip="today">📅 Today</span>
+      <span class="inv-chip" data-chip="month">📆 This Month</span>
+      <span class="inv-chip" data-chip="overdue">⚠️ Overdue</span>
+    </div>
+
+    <!-- ── Invoices Panel ── -->
+    <div class="inv-panel">
+      <div class="inv-panel-head">
+        <div class="inv-panel-title">
+          All Invoices
+          <span class="inv-count" id="invCount">0</span>
+        </div>
+        <div class="inv-filters">
+          <input
+            class="inv-search"
+            type="text"
+            id="searchInput"
+            placeholder="🔍 Search customer, event or ID…"
+            oninput="Invoices.render()">
+          <select class="inv-select" id="statusFilter" onchange="Invoices.render()">
+            <option value="All">All Status</option>
+            <option value="Pending">Pending</option>
+            <option value="Confirmed">Confirmed</option>
+            <option value="In Progress">In Progress</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- ── Bulk Actions Bar ── -->
+      <div class="bulk-bar" id="bulkBar">
+        <span class="bulk-count" id="bulkCount">0 selected</span>
+        <button class="bulk-btn" id="bulkDeliverBtn">✓ Mark Delivered</button>
+        <button class="bulk-btn" id="bulkExportBtn">📦 Export</button>
+        <button class="bulk-btn danger" id="bulkClearBtn">✕ Clear</button>
+      </div>
+
+      <!-- ── Invoices Table ── -->
+      <div class="inv-table-wrap">
+        <table class="inv-table">
+          <thead>
+            <tr>
+              <th class="inv-check-col">
+                <input type="checkbox" class="inv-checkbox" id="selectAll" title="Select all">
+              </th>
+              <th data-sort="eventDate">Invoice ID <span class="sort-icon">↕</span></th>
+              <th>Customer</th>
+              <th>Status</th>
+              <th data-sort="budget">Total Amount <span class="sort-icon">↕</span></th>
+              <th data-sort="advance">Advance Paid <span class="sort-icon">↕</span></th>
+              <th>Balance Due</th>
+              <th>Payment %</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="invTableBody">
+            <tr>
+              <td colspan="9" class="inv-loading">
+                <div class="spinner"></div>
+                <div style="margin-top:12px;">Loading invoices…</div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Footer ── -->
+  <footer class="page-footer">© 2026 Obito Photography Management. All rights reserved.</footer>
+</div>
+
+<!-- ── Invoice Modal ── -->
+<div class="modal-overlay" id="invModal">
+  <div class="modal inv-modal">
+    <div class="modal-header" style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border);background:var(--bg);">
+      <div class="modal-title">Invoice Preview</div>
+      <button class="modal-close" onclick="Invoices.closeModal()">✕</button>
+    </div>
+    <div id="invModalContent" style="max-height:calc(100vh - 180px);overflow-y:auto;">
+      <!-- Invoice rendered here -->
+    </div>
+    <div class="inv-modal-footer">
+      <button class="btn btn-ghost" onclick="Invoices.shareWhatsApp()">💬 WhatsApp</button>
+      <button class="btn btn-ghost" onclick="Invoices.print()">🖨️ Print</button>
+      <button class="btn btn-primary" onclick="Invoices.closeModal()">✕ Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Global Toast ── -->
+<div class="toast" id="globalToast"></div>
+
+<!-- ── Scripts ── -->
+<script src="shared.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+<script src="supabase.js"></script>
+<script src="db.js"></script>
+<script src="invoice.js"></script>
+
+</body>
+</html>

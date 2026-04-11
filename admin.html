@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Obito Photography Admin Login">
+  <title>Login — Obito Photography</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{--primary:#3b82f6;--accent:#06b6d4;--bg:#f0f4f8;--bg-card:#fff;--text:#1e293b;--text-muted:#64748b;--border:#e2e8f0;--success:#10b981;--danger:#ef4444;--font:'Plus Jakarta Sans',system-ui,sans-serif;}
+    body.dark-mode{--bg:#0f172a;--bg-card:#1e293b;--text:#f1f5f9;--text-muted:#94a3b8;--border:#334155;}
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;transition:background .3s,color .2s;-webkit-font-smoothing:antialiased;}
+    header{padding:16px 36px;display:flex;justify-content:space-between;align-items:center;background:var(--bg-card);border-bottom:1px solid var(--border);animation:slideDown .4s ease both;}
+    .logo-row{display:flex;align-items:center;gap:12px;}
+    .logo-box{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#ef4444,#f97316);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:17px;box-shadow:0 4px 10px rgba(239,68,68,.3);}
+    .brand{font-size:16px;font-weight:700;}
+    .theme-btn{width:36px;height:36px;border:1px solid var(--border);background:var(--bg);border-radius:9px;cursor:pointer;font-size:17px;display:flex;align-items:center;justify-content:center;transition:transform .3s;color:var(--text);}
+    .theme-btn:hover{transform:scale(1.1) rotate(12deg);}
+    main{flex:1;display:flex;align-items:center;justify-content:center;padding:36px 16px;}
+    .card{width:100%;max-width:420px;background:var(--bg-card);border:1px solid var(--border);border-radius:16px;padding:36px;box-shadow:0 4px 24px rgba(0,0,0,.08);animation:scaleIn .5s cubic-bezier(.34,1.56,.64,1) .1s both;}
+    .card-icon{width:64px;height:64px;border-radius:18px;background:linear-gradient(135deg,#ef4444,#f97316);display:flex;align-items:center;justify-content:center;color:#fff;font-size:28px;margin:0 auto 20px;box-shadow:0 6px 18px rgba(239,68,68,.3);}
+    .card-head{text-align:center;margin-bottom:28px;}
+    .card-head h1{font-size:24px;font-weight:800;margin-bottom:7px;background:linear-gradient(135deg,var(--primary),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+    .card-head p{font-size:13px;color:var(--text-muted);}
+
+    .alert{display:none;padding:11px 14px;border-radius:9px;margin-bottom:18px;font-size:13px;font-weight:600;gap:7px;align-items:center;}
+    .alert-ok {background:rgba(16,185,129,.1);color:#065f46;border:1px solid rgba(16,185,129,.2);}
+    .alert-err{background:rgba(239,68,68,.08);color:#7f1d1d;border:1px solid rgba(239,68,68,.2);}
+    .alert-warn{background:rgba(245,158,11,.08);color:#92400e;border:1px solid rgba(245,158,11,.2);}
+    body.dark-mode .alert-ok{color:#6ee7b7;}
+    body.dark-mode .alert-err{color:#fca5a5;}
+    body.dark-mode .alert-warn{color:#fde68a;}
+
+    .fg{margin-bottom:16px;position:relative;}
+    .fg label{display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted);margin-bottom:6px;}
+    .input-wrap{position:relative;}
+    .fg input[type=text],.fg input[type=password]{width:100%;padding:10px 40px 10px 13px;border:1px solid var(--border);border-radius:9px;font-size:14px;background:var(--bg-card);color:var(--text);outline:none;transition:all .2s;font-family:var(--font);}
+    body.dark-mode .fg input{background:var(--bg);}
+    .fg input:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(59,130,246,.1);}
+    .fg input:focus.error-field,.fg input.error-field{border-color:var(--danger);box-shadow:0 0 0 3px rgba(239,68,68,.1);}
+    .fg input::placeholder{color:#94a3b8;}
+    .toggle-pw{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:16px;color:var(--text-muted);padding:2px;line-height:1;transition:color .2s;}
+    .toggle-pw:hover{color:var(--primary);}
+
+    .row{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;font-size:13px;}
+    .rem{display:flex;align-items:center;gap:6px;cursor:pointer;user-select:none;}
+    .rem input{accent-color:var(--primary);width:14px;height:14px;cursor:pointer;}
+
+    .btn-login{width:100%;padding:11px;border-radius:9px;border:none;background:linear-gradient(135deg,var(--primary),var(--accent));color:#fff;font-size:14px;font-weight:700;cursor:pointer;transition:all .25s;font-family:var(--font);display:flex;align-items:center;justify-content:center;gap:8px;}
+    .btn-login:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 8px 20px rgba(59,130,246,.38);}
+    .btn-login:disabled{opacity:.55;cursor:not-allowed;transform:none;}
+    .btn-login .spinner{width:16px;height:16px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite;display:none;}
+    .btn-login.loading .spinner{display:block;}
+    .btn-login.loading .btn-text{display:none;}
+
+    .attempts-bar{height:3px;border-radius:3px;background:var(--border);margin-top:14px;overflow:hidden;}
+    .attempts-fill{height:100%;border-radius:3px;background:var(--success);transition:width .4s,background .4s;}
+
+    .lockout-timer{text-align:center;margin-top:12px;font-size:12px;color:var(--danger);font-weight:600;display:none;}
+
+    footer{padding:16px;text-align:center;border-top:1px solid var(--border);font-size:12px;color:var(--text-muted);}
+
+    @keyframes scaleIn{from{opacity:0;transform:scale(.93)}to{opacity:1;transform:scale(1)}}
+    @keyframes slideDown{from{opacity:0;transform:translateY(-14px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .shake{animation:shake .4s ease;}
+    @media(max-width:480px){.card{padding:24px 18px;}header{padding:12px 18px;}}
+  </style>
+</head>
+<body>
+<header>
+  <div class="logo-row">
+    <div class="logo-box">OP</div>
+    <div class="brand">Obito Photography</div>
+  </div>
+  <button class="theme-btn" id="themeBtn" title="Toggle theme">🌙</button>
+</header>
+
+<main>
+  <div class="card">
+    <div class="card-icon">📸</div>
+    <div class="card-head">
+      <h1>Admin Panel</h1>
+      <p>Sign in to manage your photography business</p>
+    </div>
+
+    <div class="alert alert-ok"   id="alertOk">✅ Login successful! Redirecting…</div>
+    <div class="alert alert-err"  id="alertErr"><span id="alertMsg">Invalid username or password.</span></div>
+    <div class="alert alert-warn" id="alertWarn"><span id="alertWarnMsg"></span></div>
+
+    <form id="loginForm" novalidate autocomplete="on">
+      <div class="fg">
+        <label for="username">Username</label>
+        <div class="input-wrap">
+          <input type="text" id="username" placeholder="Enter your username" autocomplete="username" required>
+        </div>
+      </div>
+      <div class="fg">
+        <label for="password">Password</label>
+        <div class="input-wrap">
+          <input type="password" id="password" placeholder="Enter your password" autocomplete="current-password" required>
+          <button type="button" class="toggle-pw" id="togglePw" title="Show/hide password" aria-label="Toggle password visibility">👁</button>
+        </div>
+      </div>
+      <div class="row">
+        <label class="rem">
+          <input type="checkbox" id="remember"> Remember me
+        </label>
+      </div>
+      <button type="submit" class="btn-login" id="loginBtn">
+        <div class="spinner"></div>
+        <span class="btn-text">🔐 Login to Dashboard</span>
+      </button>
+      <div class="attempts-bar"><div class="attempts-fill" id="attemptsFill" style="width:100%"></div></div>
+      <div class="lockout-timer" id="lockoutTimer"></div>
+    </form>
+  </div>
+</main>
+
+<footer>© 2026 Obito Photography Management System</footer>
+
+<script>
+  /* ─── CREDENTIALS ─────────────────────────────────────────────────
+     Add/edit users here. Passwords are plain-text for simplicity;
+     for production use server-side hashing (bcrypt).
+     ────────────────────────────────────────────────────────────────── */
+  const USERS = [
+    { username: 'admin',    password: 'Admin@2026',  displayName: 'Administrator' },
+    { username: 'obito',    password: 'Obito@2026',  displayName: 'Obito'         },
+    { username: 'manager',  password: 'Manager@123', displayName: 'Manager'       },
+  ];
+
+  /* ─── LOCKOUT CONFIG ─────────────────────────────────────────────── */
+  const MAX_ATTEMPTS  = 5;    // attempts before lockout
+  const LOCKOUT_SECS  = 30;   // lockout duration in seconds
+
+  /* ─── STATE ──────────────────────────────────────────────────────── */
+  let failCount   = parseInt(sessionStorage.getItem('loginFails') || '0');
+  let lockoutEnd  = parseInt(sessionStorage.getItem('lockoutEnd')  || '0');
+  let lockTimer   = null;
+
+  /* ─── THEME ──────────────────────────────────────────────────────── */
+  const themeBtn = document.getElementById('themeBtn');
+  const applyTheme = (dark) => {
+    document.body.classList.toggle('dark-mode', dark);
+    themeBtn.textContent = dark ? '☀️' : '🌙';
+  };
+  applyTheme(localStorage.getItem('theme') === 'dark');
+  themeBtn.addEventListener('click', () => {
+    const dark = !document.body.classList.contains('dark-mode');
+    applyTheme(dark);
+    localStorage.setItem('theme', dark ? 'dark' : 'light');
+  });
+
+  /* ─── AUTO-REDIRECT IF ALREADY LOGGED IN ────────────────────────── */
+  if (sessionStorage.getItem('loggedIn') === 'true') {
+    window.location.replace('dashboard.html');
+  }
+
+  /* ─── REMEMBER USERNAME ──────────────────────────────────────────── */
+  const savedUser = localStorage.getItem('rememberedUser');
+  if (savedUser) {
+    document.getElementById('username').value = savedUser;
+    document.getElementById('remember').checked = true;
+  }
+
+  /* ─── SHOW/HIDE PASSWORD ─────────────────────────────────────────── */
+  const pwInput  = document.getElementById('password');
+  const togglePw = document.getElementById('togglePw');
+  togglePw.addEventListener('click', () => {
+    const isHidden = pwInput.type === 'password';
+    pwInput.type   = isHidden ? 'text' : 'password';
+    togglePw.textContent = isHidden ? '🙈' : '👁';
+  });
+
+  /* ─── ALERT HELPERS ──────────────────────────────────────────────── */
+  function showErr(msg) {
+    hide('alertOk'); hide('alertWarn');
+    document.getElementById('alertMsg').textContent = msg;
+    show('alertErr');
+    document.getElementById('loginForm').classList.add('shake');
+    setTimeout(() => document.getElementById('loginForm').classList.remove('shake'), 400);
+  }
+  function showWarn(msg) {
+    hide('alertOk'); hide('alertErr');
+    document.getElementById('alertWarnMsg').textContent = msg;
+    show('alertWarn');
+  }
+  function showOk(msg) {
+    hide('alertErr'); hide('alertWarn');
+    document.getElementById('alertOk').textContent = '✅ ' + msg;
+    show('alertOk');
+  }
+  function show(id) { document.getElementById(id).style.display = 'flex'; }
+  function hide(id) { document.getElementById(id).style.display = 'none'; }
+
+  /* ─── ATTEMPTS BAR ───────────────────────────────────────────────── */
+  function updateAttemptsBar() {
+    const pct = Math.max(0, ((MAX_ATTEMPTS - failCount) / MAX_ATTEMPTS) * 100);
+    const fill = document.getElementById('attemptsFill');
+    fill.style.width = pct + '%';
+    fill.style.background = pct > 60 ? '#10b981' : pct > 30 ? '#f59e0b' : '#ef4444';
+  }
+  updateAttemptsBar();
+
+  /* ─── LOCKOUT ────────────────────────────────────────────────────── */
+  function isLockedOut() { return Date.now() < lockoutEnd; }
+
+  function startLockoutDisplay() {
+    const btn   = document.getElementById('loginBtn');
+    const timer = document.getElementById('lockoutTimer');
+    btn.disabled = true;
+    timer.style.display = 'block';
+    clearInterval(lockTimer);
+    lockTimer = setInterval(() => {
+      const remaining = Math.ceil((lockoutEnd - Date.now()) / 1000);
+      if (remaining <= 0) {
+        clearInterval(lockTimer);
+        btn.disabled = false;
+        timer.style.display = 'none';
+        hide('alertWarn');
+        failCount = 0;
+        sessionStorage.removeItem('loginFails');
+        sessionStorage.removeItem('lockoutEnd');
+        updateAttemptsBar();
+      } else {
+        timer.textContent = `⏳ Too many attempts. Try again in ${remaining}s`;
+        showWarn(`Account temporarily locked. ${remaining} seconds remaining.`);
+      }
+    }, 500);
+  }
+
+  /* Resume lockout if page was refreshed mid-lockout */
+  if (isLockedOut()) {
+    startLockoutDisplay();
+    showWarn('Too many failed attempts. Please wait.');
+  }
+
+  /* ─── LOGIN HANDLER ──────────────────────────────────────────────── */
+  document.getElementById('loginForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    if (isLockedOut()) {
+      showWarn('Account is locked. Please wait before trying again.');
+      return;
+    }
+
+    const u   = document.getElementById('username').value.trim().toLowerCase();
+    const p   = document.getElementById('password').value;
+    const btn = document.getElementById('loginBtn');
+
+    hide('alertErr'); hide('alertOk'); hide('alertWarn');
+
+    if (!u || !p) {
+      showErr('Please enter both username and password.');
+      return;
+    }
+
+    /* Loading state */
+    btn.disabled = true;
+    btn.classList.add('loading');
+
+    setTimeout(() => {
+      /* ── Credential check ── */
+      const match = USERS.find(
+        usr => usr.username.toLowerCase() === u && usr.password === p
+      );
+
+      if (match) {
+        /* SUCCESS */
+        failCount = 0;
+        sessionStorage.removeItem('loginFails');
+        sessionStorage.removeItem('lockoutEnd');
+
+        if (document.getElementById('remember').checked) {
+          localStorage.setItem('rememberedUser', match.username);
+        } else {
+          localStorage.removeItem('rememberedUser');
+        }
+
+        sessionStorage.setItem('loggedIn',     'true');
+        sessionStorage.setItem('username',      match.displayName);
+        sessionStorage.setItem('loginTime',     new Date().toISOString());
+
+        btn.classList.remove('loading');
+        showOk(`Welcome back, ${match.displayName}! Redirecting…`);
+        setTimeout(() => window.location.href = 'dashboard.html', 1000);
+
+      } else {
+        /* FAILURE */
+        btn.disabled = false;
+        btn.classList.remove('loading');
+        failCount++;
+        sessionStorage.setItem('loginFails', failCount);
+        updateAttemptsBar();
+
+        const remaining = MAX_ATTEMPTS - failCount;
+
+        if (failCount >= MAX_ATTEMPTS) {
+          lockoutEnd = Date.now() + LOCKOUT_SECS * 1000;
+          sessionStorage.setItem('lockoutEnd', lockoutEnd);
+          startLockoutDisplay();
+          showWarn(`Too many failed attempts. Locked for ${LOCKOUT_SECS} seconds.`);
+        } else {
+          showErr(
+            remaining === 1
+              ? `Incorrect username or password. ⚠️ 1 attempt remaining before lockout.`
+              : `Incorrect username or password. ${remaining} attempts remaining.`
+          );
+        }
+
+        /* Shake the password field */
+        pwInput.classList.add('error-field');
+        setTimeout(() => pwInput.classList.remove('error-field'), 1500);
+        pwInput.value = '';
+        pwInput.focus();
+      }
+    }, 600);
+  });
+</script>
+</body>
+</html>

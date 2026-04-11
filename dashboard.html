@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard — Obito Photography</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="animations.css">
+  <link rel="stylesheet" href="shared.css">
+  <style>
+    .stats-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:16px;margin-bottom:28px;}
+    .stat-card{animation:floatIn .5s ease-out both;}
+    .stat-card:nth-child(1){animation-delay:.05s}.stat-card:nth-child(2){animation-delay:.10s}
+    .stat-card:nth-child(3){animation-delay:.15s}.stat-card:nth-child(4){animation-delay:.20s}
+    .stat-card:nth-child(5){animation-delay:.25s}
+    .greeting{margin-bottom:26px;animation:slideInUp .5s ease-out both;}
+    .greeting-text{font-family:var(--font-heading);font-size:26px;font-weight:700;margin-bottom:4px;background:linear-gradient(135deg,var(--text),var(--primary));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+    .greeting-sub{font-size:14px;color:var(--text-muted);}
+    .live-badge{display:inline-flex;align-items:center;gap:5px;background:rgba(16,185,129,.1);color:#10b981;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;border:1px solid rgba(16,185,129,.2);}
+    .live-dot{width:7px;height:7px;border-radius:50%;background:#10b981;animation:livePulse 1.8s ease-in-out infinite;}
+    .charts-row{display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:26px;}
+    .chart-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px;box-shadow:var(--shadow-sm);transition:var(--transition);animation:floatIn .5s ease-out .3s both;}
+    .chart-card:hover{transform:translateY(-3px);box-shadow:var(--shadow);}
+    .chart-title{font-size:14px;font-weight:700;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;}
+    .chart-badge{font-size:11px;color:var(--text-muted);background:var(--bg);padding:2px 9px;border-radius:20px;border:1px solid var(--border);}
+    .chart-container{position:relative;height:230px;}
+    .section-title{font-family:var(--font-heading);font-size:15px;font-weight:700;margin-bottom:14px;margin-top:26px;display:flex;align-items:center;gap:9px;}
+    .section-title::after{content:'';flex:1;height:1px;background:var(--border);}
+    .pending-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px;box-shadow:var(--shadow-sm);margin-bottom:26px;animation:floatIn .5s ease-out .4s both;}
+    .pending-header{font-size:14px;font-weight:700;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;}
+    .pending-count{background:var(--primary-light);color:var(--primary);padding:2px 9px;border-radius:20px;font-size:12px;font-weight:700;}
+    .pending-item{display:flex;justify-content:space-between;align-items:center;padding:10px 13px;background:var(--bg);border-radius:9px;margin-bottom:6px;transition:var(--transition);}
+    .pending-item:hover{background:linear-gradient(135deg,var(--primary),var(--accent));color:white;transform:translateX(4px);}
+    .pending-item:hover .pending-date,.pending-item:hover .pending-badge{color:rgba(255,255,255,.85);}
+    .pending-name{font-size:13px;font-weight:600;margin-bottom:2px;}
+    .pending-date{font-size:12px;color:var(--text-muted);transition:color .15s;}
+    .pending-badge{padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700;transition:var(--transition);}
+    .bp{background:rgba(245,158,11,.12);color:#f59e0b;} .bc{background:rgba(16,185,129,.12);color:#10b981;} .bi{background:rgba(59,130,246,.12);color:var(--primary);}
+    .actions-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:28px;}
+    .action-card{background:linear-gradient(135deg,var(--primary),var(--accent));border-radius:var(--radius-lg);padding:16px 18px;color:white;cursor:pointer;transition:transform .3s ease,box-shadow .3s ease;box-shadow:0 6px 18px rgba(59,130,246,.22);animation:floatIn .5s ease-out both;overflow:hidden;}
+    .action-card:nth-child(1){animation-delay:.5s}.action-card:nth-child(2){animation-delay:.6s}.action-card:nth-child(3){animation-delay:.7s}
+    .action-card:hover{transform:translateY(-5px) scale(1.01);box-shadow:0 14px 36px rgba(59,130,246,.38);}
+    .action-icon{font-size:24px;margin-bottom:8px;display:block;transition:transform .3s cubic-bezier(.34,1.56,.64,1);}
+    .action-card:hover .action-icon{transform:scale(1.2) rotate(-5deg);}
+    .action-title{font-size:13px;font-weight:700;margin-bottom:2px;}
+    .action-desc{font-size:12px;opacity:.85;margin-bottom:8px;}
+    .action-link{font-size:12px;font-weight:700;display:inline-flex;align-items:center;gap:4px;transition:gap .25s;}
+    .action-card:hover .action-link{gap:9px;}
+    .not-logged{text-align:center;padding:80px 20px;}
+    .not-logged h2{font-size:22px;margin-bottom:10px;}
+    .not-logged p{color:var(--text-muted);margin-bottom:20px;}
+    .not-logged a{display:inline-block;padding:10px 24px;background:var(--primary);color:white;border-radius:9px;font-weight:600;transition:all .2s;}
+    .not-logged a:hover{background:var(--primary-hover);transform:translateY(-2px);}
+    @media(max-width:1100px){.stats-grid{grid-template-columns:repeat(3,1fr);}}
+    @media(max-width:900px){.charts-row{grid-template-columns:1fr;}.actions-grid{grid-template-columns:1fr 1fr;}}
+    @media(max-width:640px){.stats-grid{grid-template-columns:1fr 1fr;}.actions-grid{grid-template-columns:1fr;}}
+  </style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-logo" onclick="navigateTo('dashboard.html')" title="Home">OP</div>
+  <nav class="sidebar-items">
+    <div class="sidebar-item active" data-page="dashboard.html"     data-title="Dashboard" onclick="navigateTo('dashboard.html')">📊</div>
+    <div class="sidebar-item"        data-page="bookings-list.html" data-title="Bookings"  onclick="navigateTo('bookings-list.html')">📅</div>
+    <div class="sidebar-item"        data-page="customers.html"     data-title="Customers" onclick="navigateTo('customers.html')">👥</div>
+    <div class="sidebar-item"        data-page="invoices.html"      data-title="Invoices"  onclick="navigateTo('invoices.html')">📄</div>
+  </nav>
+  <div class="sidebar-logout" data-action="logout" title="Logout">🚪</div>
+</aside>
+
+<div class="main-content">
+  <header class="topbar">
+    <div class="topbar-left">
+      <span class="topbar-title">Dashboard</span>
+      <span class="live-badge"><span class="live-dot"></span>Live</span>
+    </div>
+    <div class="topbar-right">
+      <div class="topbar-date"><span class="date-label">Today</span><span class="date-value" id="currentDate">—</span></div>
+      <button class="theme-btn" id="themeBtn" title="Toggle theme">🌙</button>
+      <div class="user-btn" id="userBtn">
+        <div class="user-avatar" id="userAvatarInitials">U</div>
+        <div class="user-info"><div class="user-name" id="userNameDisplay">User</div><div class="user-role">Admin</div></div>
+        <span class="user-chevron">▼</span>
+        <div class="user-dropdown" id="userDropdown">
+          <div class="dropdown-header">
+            <div class="dropdown-avatar" id="dropdownAvatar">U</div>
+            <div><div class="dropdown-name" id="dropdownName">User</div><div class="dropdown-status">● Active</div></div>
+          </div>
+          <div class="dropdown-menu">
+            <a class="dropdown-item" onclick="navigateTo('bookings-list.html')"><span class="dropdown-item-icon">📅</span> Bookings</a>
+            <a class="dropdown-item" onclick="navigateTo('customers.html')"><span class="dropdown-item-icon">👥</span> Customers</a>
+            <a class="dropdown-item" onclick="navigateTo('invoices.html')"><span class="dropdown-item-icon">📄</span> Invoices</a>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item danger" onclick="logout()"><span class="dropdown-item-icon">🚪</span> Logout</a>
+          </div>
+        </div>
+      </div>
+      <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
+  </header>
+
+  <div class="page-content">
+    <div id="dashboardContent">
+      <div class="greeting">
+        <div class="greeting-text" id="greeting">Good day! 👋</div>
+        <div class="greeting-sub"  id="greetingSub">Here's your live business overview</div>
+      </div>
+
+      <div class="section-title">📊 Overview</div>
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-icon">📅</div><div class="stat-label">Total Bookings</div><div class="stat-value" id="s-bookings">—</div><div class="stat-change">All time</div></div>
+        <div class="stat-card"><div class="stat-icon">💰</div><div class="stat-label">Advance Received</div><div class="stat-value" id="s-advance">—</div><div class="stat-change">↑ Collected</div></div>
+        <div class="stat-card"><div class="stat-icon">⏳</div><div class="stat-label">Pending Balance</div><div class="stat-value" id="s-pending">—</div><div class="stat-change down">↓ To collect</div></div>
+        <div class="stat-card"><div class="stat-icon">📈</div><div class="stat-label">Total Revenue</div><div class="stat-value" id="s-revenue">—</div><div class="stat-change">📈 Generated</div></div>
+        <div class="stat-card"><div class="stat-icon">💎</div><div class="stat-label">Avg Booking</div><div class="stat-value" id="s-avg">—</div><div class="stat-change">Per booking</div></div>
+      </div>
+
+      <div class="section-title">📉 Analytics</div>
+      <div class="charts-row">
+        <div class="chart-card">
+          <div class="chart-title">Monthly Bookings <span class="chart-badge" id="chartBadge">Loading…</span></div>
+          <div class="chart-container"><canvas id="monthlyChart"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">Revenue Split</div>
+          <div class="chart-container"><canvas id="revenueChart"></canvas></div>
+        </div>
+      </div>
+
+      <div class="pending-card">
+        <div class="pending-header">⏰ Pending Deliveries <span class="pending-count" id="pendingCount">0</span></div>
+        <div id="pendingList"><div class="loading-row"><div class="spinner"></div></div></div>
+      </div>
+
+      <div class="section-title">⚡ Quick Actions</div>
+      <div class="actions-grid">
+        <div class="action-card" onclick="navigateTo('add-booking.html')">
+          <span class="action-icon">📅</span>
+          <div class="action-title">Add Booking</div>
+          <div class="action-desc">Create a new event booking</div>
+          <div class="action-link">Go <span>→</span></div>
+        </div>
+        <div class="action-card" onclick="navigateTo('customers.html')">
+          <span class="action-icon">👥</span>
+          <div class="action-title">Customers</div>
+          <div class="action-desc">Manage your customer database</div>
+          <div class="action-link">Go <span>→</span></div>
+        </div>
+        <div class="action-card" onclick="navigateTo('invoices.html')">
+          <span class="action-icon">📄</span>
+          <div class="action-title">Invoices</div>
+          <div class="action-desc">View and print invoices</div>
+          <div class="action-link">Go <span>→</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="not-logged" id="notLoggedIn" style="display:none;">
+      <h2>🔒 Not logged in</h2>
+      <p>Please sign in to access the dashboard.</p>
+      <a href="admin.html">Go to Login →</a>
+    </div>
+  </div>
+  <footer class="page-footer">© 2026 Obito Photography Management. All rights reserved.</footer>
+</div>
+
+<div class="toast" id="globalToast"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+<script src="shared.js"></script>
+<script src="db.js"></script>
+<script>
+let barChart = null, donutChart = null;
+
+function updateGreeting() {
+  const h = new Date().getHours();
+  const el = document.getElementById('greeting');
+  const sub = document.getElementById('greetingSub');
+  if (!el) return;
+  const msgs = [
+    [5,  'Still up? 🌙',       "Burning the midnight oil — let's check your stats."],
+    [12, 'Good morning! 🌅',   'Time to start your day strong.'],
+    [18, 'Good afternoon! ☀️', 'Keep up the great work!'],
+    [24, 'Good evening! 🌙',   "Here's today's performance summary."]
+  ];
+  const [, greet, subtitle] = msgs.find(([limit]) => h < limit) || msgs[3];
+  el.innerHTML = greet;
+  if (sub) sub.textContent = subtitle;
+}
+
+function fmtINR(n) {
+  n = parseInt(n) || 0;
+  if (n >= 100000) return '₹' + (n/100000).toFixed(1) + 'L';
+  if (n >= 1000)   return '₹' + (n/1000).toFixed(0) + 'K';
+  return '₹' + n.toLocaleString('en-IN');
+}
+
+function animCount(id, end, fmt) {
+  const el = document.getElementById(id); if (!el) return;
+  const dur = 900, t0 = performance.now();
+  function step(now) {
+    const p = Math.min((now - t0) / dur, 1);
+    const ease = 1 - Math.pow(1 - p, 3);
+    el.textContent = fmt(Math.round(end * ease));
+    if (p < 1) requestAnimationFrame(step);
+    else el.textContent = fmt(end);
+  }
+  requestAnimationFrame(step);
+}
+
+function loadStats(bookings) {
+  const advance = bookings.reduce((s,b) => s + (parseInt(b.advance)||0), 0);
+  const budget  = bookings.reduce((s,b) => s + (parseInt(b.budget)||0), 0);
+  const pending = Math.max(0, budget - advance);
+  const avg     = bookings.length ? Math.round(budget / bookings.length) : 0;
+  animCount('s-bookings', bookings.length, n => n);
+  animCount('s-advance',  advance,  fmtINR);
+  animCount('s-pending',  pending,  fmtINR);
+  animCount('s-revenue',  budget,   fmtINR);
+  animCount('s-avg',      avg,      fmtINR);
+  return { advance, budget, pending };
+}
+
+function loadPending(bookings) {
+  const list  = document.getElementById('pendingList');
+  const items = bookings.filter(b => !b.delivered).slice(0, 6);
+  document.getElementById('pendingCount').textContent = items.length;
+  if (!items.length) {
+    list.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:14px;">🎉 All deliveries complete!</div>';
+    return;
+  }
+  list.innerHTML = items.map((b, i) => {
+    const cls = b.status === 'Confirmed' ? 'bc' : b.status === 'In Progress' ? 'bi' : 'bp';
+    const date = b.eventDate ? new Date(b.eventDate).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}) : 'TBD';
+    return `<div class="pending-item" style="animation-delay:${(i*.06).toFixed(2)}s">
+      <div>
+        <div class="pending-name">${b.eventType || 'Event'} — ${b.customerName || 'Customer'}</div>
+        <div class="pending-date">📅 ${date} &nbsp;|&nbsp; 📍 ${b.city || b.venue || '—'}</div>
+      </div>
+      <span class="pending-badge ${cls}">${b.status || 'Pending'}</span>
+    </div>`;
+  }).join('');
+}
+
+function buildCharts(bookings, advance, budget) {
+  const dark = document.body.classList.contains('dark-mode');
+  const tick  = dark ? '#94a3b8' : '#64748b';
+  const grid  = dark ? 'rgba(148,163,184,.07)' : 'rgba(0,0,0,.05)';
+  const yr    = new Date().getFullYear();
+  const mc    = new Array(12).fill(0);
+  bookings.forEach(b => {
+    const d = new Date(b.eventDate || b.createdAt);
+    if (!isNaN(d) && d.getFullYear() === yr) mc[d.getMonth()]++;
+  });
+  const total = mc.reduce((s,v) => s + v, 0);
+  const badge = document.getElementById('chartBadge');
+  if (badge) badge.textContent = total + ' booking' + (total !== 1 ? 's' : '') + ' in ' + yr;
+
+  const bCtx = document.getElementById('monthlyChart');
+  if (barChart) barChart.destroy();
+  barChart = new Chart(bCtx, {
+    type: 'bar',
+    data: {
+      labels: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
+      datasets: [{ label:'Bookings', data:mc,
+        backgroundColor:'rgba(59,130,246,.6)', borderColor:'rgba(59,130,246,1)',
+        borderWidth:2, borderRadius:8, hoverBackgroundColor:'rgba(6,182,212,.8)' }]
+    },
+    options: {
+      responsive:true, maintainAspectRatio:false,
+      animation:{duration:900,easing:'easeOutQuart'},
+      plugins:{legend:{display:false},tooltip:{backgroundColor:'rgba(15,23,42,.9)',padding:10,displayColors:false,titleColor:'#fff',bodyColor:'#94a3b8',callbacks:{label:c=>'Bookings: '+c.parsed.y}}},
+      scales:{y:{beginAtZero:true,ticks:{color:tick,font:{size:11}},grid:{color:grid,drawBorder:false}},x:{ticks:{color:tick,font:{size:10}},grid:{display:false}}}
+    }
+  });
+
+  const dCtx = document.getElementById('revenueChart');
+  if (donutChart) donutChart.destroy();
+  const pend = Math.max(0, budget - advance);
+  donutChart = new Chart(dCtx, {
+    type: 'doughnut',
+    data: {
+      labels: ['Advance Received','Pending Balance'],
+      datasets: [{ data:[advance||1, pend||(advance?0:1)],
+        backgroundColor:['rgba(34,197,94,.7)','rgba(251,146,60,.7)'],
+        borderColor:['rgba(34,197,94,1)','rgba(251,146,60,1)'],
+        borderWidth:3, hoverOffset:8 }]
+    },
+    options: {
+      responsive:true, maintainAspectRatio:false,
+      animation:{duration:1100,easing:'easeOutCirc'},
+      plugins:{legend:{position:'bottom',labels:{color:tick,font:{size:12},padding:14,usePointStyle:true,pointStyle:'circle'}},tooltip:{backgroundColor:'rgba(15,23,42,.9)',padding:10,titleColor:'#fff',bodyColor:'#94a3b8',callbacks:{label:c=>'  '+c.label+': '+fmtINR(c.parsed)}}}
+    }
+  });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  if (!sessionStorage.getItem('loggedIn')) {
+    document.getElementById('dashboardContent').style.display = 'none';
+    document.getElementById('notLoggedIn').style.display = 'block';
+    if (typeof sharedInit === 'function') sharedInit();
+    return;
+  }
+  sharedInit();
+  updateGreeting();
+  setInterval(updateGreeting, 3600000);
+
+  DB.init().then(async () => {
+    const bookings = await DB.bookings.getAll();
+    const { advance, budget } = loadStats(bookings);
+    loadPending(bookings);
+
+    function tryCharts() {
+      if (typeof Chart !== 'undefined') { buildCharts(bookings, advance, budget); }
+      else { setTimeout(tryCharts, 200); }
+    }
+    tryCharts();
+
+    document.getElementById('themeBtn').addEventListener('click', () => {
+      setTimeout(() => buildCharts(bookings, advance, budget), 150);
+    });
+  }).catch(err => { console.error('[Dashboard] DB error:', err); showToast('⚠️ Error loading data', 'error'); });
+});
+</script>
+</body>
+</html>
