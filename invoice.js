@@ -342,8 +342,24 @@ const Invoices = (() => {
     body { background:#e8edf2; font-family:'Plus Jakarta Sans',sans-serif; display:flex; justify-content:center; padding:32px 16px; }
     @page { size:A4 portrait; margin:0; }
     @media print {
-      body { background:white!important; padding:0; }
-      .invoice-a4 { box-shadow:none!important; width:210mm!important; min-height:297mm!important; }
+      body { background:white!important; padding:0; margin:0; }
+      @page { size:A4 portrait; margin:0; }
+      .invoice-a4 {
+        box-shadow:none!important;
+        width:210mm!important;
+        height:auto!important;
+        min-height:auto!important;
+        page-break-after:always;
+        page-break-inside:avoid;
+        margin:0!important;
+        padding:0!important;
+      }
+      .invoice-a4:last-child { page-break-after:auto; }
+      .inv-header { page-break-inside:avoid; }
+      .inv-body { page-break-inside:auto; }
+      .inv-footer { page-break-inside:avoid; }
+      .inv-tbl thead { display:table-header-group; }
+      .inv-tbl tbody tr { page-break-inside:avoid; }
       .inv-header, .inv-tbl thead tr, .inv-sum-row.total-row,
       .inv-footer::before, .inv-footer-inner, .inv-pay-box, .inv-pay-bar-fill {
         -webkit-print-color-adjust:exact!important;
@@ -351,10 +367,16 @@ const Invoices = (() => {
       }
     }
     .invoice-a4 {
-      width:794px; min-height:1123px; background:#fff;
+      width:794px; height:auto; min-height:1123px; background:#fff;
       color:#2c3e50; font-family:'Plus Jakarta Sans',sans-serif;
       display:flex; flex-direction:column;
       box-shadow:0 8px 40px rgba(0,0,0,0.22);
+      page-break-after:always;
+      margin-bottom:20px;
+    }
+    .invoice-a4:last-child {
+      page-break-after:auto;
+      margin-bottom:0;
     }
     .inv-header {
       background:linear-gradient(135deg,#1a4a8a 0%,#1e5ba8 50%,#2563eb 100%);
