@@ -206,6 +206,8 @@
 
 <div class="toast" id="globalToast"></div>
 <script src="shared.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="supabase.js"></script>
 <script src="db.js"></script>
 <script>
   let allCustomers = [];
@@ -303,7 +305,7 @@
             <div class="c-avatar">${ini}</div>
             <div>
               <div class="c-name">${name}</div>
-              <div class="c-since">Since ${c.createdAt ? new Date(c.createdAt).toLocaleDateString('en-IN',{month:'short',year:'numeric'}) : '—'}</div>
+              <div class="c-since">Since ${c.createdAt ? new Date(/^\d{4}-\d{2}-\d{2}$/.test(c.createdAt) ? c.createdAt + 'T00:00:00' : c.createdAt).toLocaleDateString('en-IN',{month:'short',year:'numeric'}) : '—'}</div>
             </div>
             <span class="c-badge ${catClass[c.category]||'b-new'}">${c.category||'New'}</span>
           </div>
