@@ -9,13 +9,6 @@
   <link rel="stylesheet" href="animations.css">
   <link rel="stylesheet" href="shared.css">
   <link rel="stylesheet" href="invoice.css">
-  <style>
-    .inv-stats { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:22px; }
-    @media(max-width:900px){ .inv-stats{ grid-template-columns:repeat(2,1fr); } }
-    @media(max-width:640px){ .inv-stats{ grid-template-columns:1fr 1fr; } }
-    /* Selected row highlight */
-    .row-selected { background: var(--primary-light) !important; }
-  </style>
 </head>
 <body>
 
@@ -74,7 +67,7 @@
       <div class="page-header-text">
         <a class="page-back" href="dashboard.html">← Dashboard</a>
         <h1>Invoice Management</h1>
-        <p>View and manage all booking invoices</p>
+        <p>View, print and share all booking invoices</p>
       </div>
       <button class="btn btn-primary" onclick="navigateTo('add-booking.html')">➕ New Booking</button>
     </div>
@@ -108,7 +101,7 @@
     </div>
 
     <!-- ── Quick Chips ── -->
-    <div class="inv-chips" style="margin-bottom:14px;">
+    <div class="inv-chips">
       <span class="inv-chip" data-chip="today">📅 Today</span>
       <span class="inv-chip" data-chip="month">📆 This Month</span>
       <span class="inv-chip" data-chip="overdue">⚠️ Overdue</span>
@@ -122,10 +115,7 @@
           <span class="inv-count" id="invCount">0</span>
         </div>
         <div class="inv-filters">
-          <input
-            class="inv-search"
-            type="text"
-            id="searchInput"
+          <input class="inv-search" type="text" id="searchInput"
             placeholder="🔍 Search customer, event or ID…"
             oninput="Invoices.render()">
           <select class="inv-select" id="statusFilter" onchange="Invoices.render()">
@@ -137,7 +127,7 @@
         </div>
       </div>
 
-      <!-- ── Bulk Actions Bar ── -->
+      <!-- Bulk Bar -->
       <div class="bulk-bar" id="bulkBar">
         <span class="bulk-count" id="bulkCount">0 selected</span>
         <button class="bulk-btn" id="bulkDeliverBtn">✓ Mark Delivered</button>
@@ -145,7 +135,7 @@
         <button class="bulk-btn danger" id="bulkClearBtn">✕ Clear</button>
       </div>
 
-      <!-- ── Invoices Table ── -->
+      <!-- Table -->
       <div class="inv-table-wrap">
         <table class="inv-table">
           <thead>
@@ -176,37 +166,35 @@
     </div>
   </div>
 
-  <!-- ── Footer ── -->
   <footer class="page-footer">© 2026 Obito Photography Management. All rights reserved.</footer>
 </div>
 
-<!-- ── Invoice Modal ── -->
+<!-- ── Invoice Modal (A4 preview) ── -->
 <div class="modal-overlay" id="invModal">
-  <div class="modal inv-modal">
-    <div class="modal-header" style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border);background:var(--bg);">
-      <div class="modal-title">Invoice Preview</div>
-      <button class="modal-close" onclick="Invoices.closeModal()">✕</button>
+  <div class="inv-modal-wrap">
+    <div class="inv-modal-topbar">
+      <div class="inv-modal-title">📄 Invoice Preview</div>
+      <div class="inv-modal-actions">
+        <button class="btn btn-ghost" onclick="Invoices.shareWhatsApp()">💬 WhatsApp</button>
+        <button class="btn btn-ghost" onclick="Invoices.print()">🖨️ Print / Save PDF</button>
+        <button class="btn btn-primary" onclick="Invoices.closeModal()">✕ Close</button>
+      </div>
     </div>
-    <div id="invModalContent" style="max-height:calc(100vh - 180px);overflow-y:auto;">
-      <!-- Invoice rendered here -->
-    </div>
-    <div class="inv-modal-footer">
-      <button class="btn btn-ghost" onclick="Invoices.shareWhatsApp()">💬 WhatsApp</button>
-      <button class="btn btn-ghost" onclick="Invoices.print()">🖨️ Print</button>
-      <button class="btn btn-primary" onclick="Invoices.closeModal()">✕ Close</button>
+    <!-- A4 scroll area -->
+    <div class="inv-modal-body">
+      <div id="invModalContent"></div>
     </div>
   </div>
 </div>
 
-<!-- ── Global Toast ── -->
+<!-- Toast -->
 <div class="toast" id="globalToast"></div>
 
-<!-- ── Scripts ── -->
+<!-- Scripts -->
 <script src="shared.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="supabase.js"></script>
 <script src="db.js"></script>
 <script src="invoice.js"></script>
-
 </body>
 </html>
